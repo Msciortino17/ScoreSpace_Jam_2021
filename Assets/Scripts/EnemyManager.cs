@@ -73,6 +73,6 @@ public class EnemyManager : MonoBehaviour
 		Transform spawner = enemySpawners[Random.Range(0, enemySpawners.Count)];
 		Enemy enemy = Instantiate(enemyPrefab, transform).GetComponent<Enemy>();
 		enemy.transform.position = spawner.position;
-		enemy.GameManager = gameManager;
+		enemy.MyGameManager = gameManager;
 	}
 }

@@ -72,6 +72,7 @@ public class Bomb : MonoBehaviour
 		Explosion explosion = Instantiate(explosionPrefab, transform.position, Quaternion.identity).GetComponent<Explosion>();
 		explosion.Damage = Damage;
 		MyExplodeCallback?.Invoke();
+		gameManager.MyCameraController.TriggerShake(3, 3, 0.25f);
 	}
 
 	/// <summary>

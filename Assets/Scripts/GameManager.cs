@@ -22,6 +22,7 @@ public class GameManager : MonoBehaviour
 	public EnemyManager MyEnemyManager;
 	public Transform TargettingNodes;
 	public Transform BuildingsParent;
+	public CameraController MyCameraController;
 
 	[Header("UI Stuff")]
 	public Text ScoreText;

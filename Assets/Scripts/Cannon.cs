@@ -5,7 +5,7 @@ using UnityEngine;
 public class Cannon : MonoBehaviour
 {
 	private Camera mainCamera;
-	private GameManager gameManager;
+	public GameManager MyGameManager;
 	[SerializeField] Transform textSpawnLocation;
 	[SerializeField] ParticleSystem targetLocationCursor;
 	private bool shooting;
@@ -29,7 +29,7 @@ public class Cannon : MonoBehaviour
 	void Start()
 	{
 		mainCamera = Camera.main;
-		gameManager = transform.parent.GetComponent<GameManager>();
+		MyGameManager = transform.parent.GetComponent<GameManager>();
 	}
 
 	// Update is called once per frame
@@ -53,7 +53,7 @@ public class Cannon : MonoBehaviour
 			targetLocation = mousePos;
 			targetLocationCursor.transform.position = targetLocation;
 			targetLocationCursor.Play();
-			gameManager.SlowDownTime();
+			MyGameManager.SlowDownTime();
 			BeginTargetting();
 		}
 
@@ -83,7 +83,7 @@ public class Cannon : MonoBehaviour
 	{
 		Bomb bomb = Instantiate(_bomb).GetComponent<Bomb>();
 		bomb.transform.position = _position;
-		bomb.gameManager = gameManager;
+		bomb.gameManager = MyGameManager;
 		return bomb;
 	}
 
@@ -105,7 +105,7 @@ public class Cannon : MonoBehaviour
 		for (int i = 0; i < numNodes; i++)
 		{
 			// Standard node init
-			TargetNode node = Instantiate(targetNodePrefab, gameManager.TargettingNodes).GetComponent<TargetNode>(); // should be batching this buuut...
+			TargetNode node = Instantiate(targetNodePrefab, MyGameManager.TargettingNodes).GetComponent<TargetNode>(); // should be batching this buuut...
 			node.MyCannon = this;
 			if (lastNode != null)
 			{
@@ -186,23 +186,22 @@ public class Cannon : MonoBehaviour
 	/// </summary>
 	public void FailedTarget(float _distance)
 	{
-		gameManager.NormalizeTime();
+		MyGameManager.NormalizeTime();
 		Bomb bomb = SpawnBomb(bombPrefab, targetLocation);
 		float offSetRange = 6f * _distance;
 		float x = Random.Range(-offSetRange, offSetRange);
 		float y = Random.Range(-offSetRange, offSetRange);
-		Debug.Log("offset: " + x + ", " + y + ", " + _distance);
 		bomb.transform.Translate(x, y, 0f);
 		shooting = false;
 
-		foreach (Transform child in gameManager.TargettingNodes)
+		foreach (Transform child in MyGameManager.TargettingNodes)
 		{
 			Destroy(child.gameObject);
 		}
 
 		TargettingLine.gameObject.SetActive(false);
 
-		gameManager.IncreaseScore((int)((1f - _distance) * 10f));
+		MyGameManager.IncreaseScore((int)((1f - _distance) * 10f));
 		int resultText = 2;
 		if (_distance > 0.8f)
 		{
@@ -222,19 +221,17 @@ public class Cannon : MonoBehaviour
 	/// </summary>
 	public void SuccessfulTarget()
 	{
-		Debug.Log("Perfect");
-		//gameManager.NormalizeTime();
 		SpawnBomb(bombPrefab, targetLocation);
 		shooting = false;
 
-		foreach (Transform child in gameManager.TargettingNodes)
+		foreach (Transform child in MyGameManager.TargettingNodes)
 		{
 			Destroy(child.gameObject);
 		}
 
 		TargettingLine.gameObject.SetActive(false);
 
-		gameManager.IncreaseScore(25);
+		MyGameManager.IncreaseScore(25);
 		ParticleText text = Instantiate(particleTextPrefab, textSpawnLocation.position, Quaternion.identity).GetComponent<ParticleText>();
 		text.SetText(TargettingLineResults[3]);
 		targetLocationCursor.Stop();

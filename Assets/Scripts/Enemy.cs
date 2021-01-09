@@ -7,7 +7,7 @@ public class Enemy : MonoBehaviour
 {
 	private Transform mySprite;
 	[SerializeField] private int scoreGranted;
-	public GameManager GameManager;
+	public GameManager MyGameManager;
 	[SerializeField] private Text healthText;
 
 	public float Health;
@@ -100,7 +100,8 @@ public class Enemy : MonoBehaviour
 	/// </summary>
 	private void Kill()
 	{
-		GameManager.IncreaseScore(scoreGranted);
+		MyGameManager.MyCameraController.TriggerShake(4, 4, 0.35f);
+		MyGameManager.IncreaseScore(scoreGranted);
 		Instantiate(DeathExplosion, transform.position, Quaternion.identity);
 		Destroy(gameObject);
 	}
