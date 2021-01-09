@@ -58,7 +58,7 @@ Canvas:
   m_SortingBucketNormalizedSize: 0
   m_AdditionalShaderChannelsFlag: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 10
+  m_SortingOrder: 9
   m_TargetDisplay: 0
 --- !u!114 &1549432542
 MonoBehaviour:
@@ -248,7 +248,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 1
+  m_SortingOrder: 8
   m_Sprite: {fileID: 21300000, guid: b717c8a2135e7d34eb347f8d4feecf06, type: 3}
   m_Color: {r: 0.9294118, g: 0.5411765, b: 0.039215688, a: 1}
   m_FlipX: 0
@@ -337,7 +337,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   scoreGranted: 50
-  GameManager: {fileID: 0}
+  MyGameManager: {fileID: 0}
   healthText: {fileID: 1815631031}
   Health: 100
   Damage: 20

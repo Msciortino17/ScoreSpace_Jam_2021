@@ -39,8 +39,11 @@ public class Cannon : MonoBehaviour
 	// Update is called once per frame
 	void Update()
 	{
-		UpdateInput();
-		UpdateTimers();
+		if (!MyGameManager.IsMainMenu)
+		{
+			UpdateInput();
+			UpdateTimers();
+		}
 	}
 
 	/// <summary>

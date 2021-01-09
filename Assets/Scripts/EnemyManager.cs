@@ -49,7 +49,10 @@ public class EnemyManager : MonoBehaviour
 	// Update is called once per frame
 	void Update()
 	{
-		UpdateSpawnEnemies();
+		if (!gameManager.IsMainMenu)
+		{
+			UpdateSpawnEnemies();
+		}
 	}
 
 	/// <summary>

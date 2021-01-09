@@ -4,6 +4,12 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
+public struct HighScore
+{
+	public string name;
+	public int score;
+}
+
 public class GameManager : MonoBehaviour
 {
 	private int score;
@@ -11,6 +17,7 @@ public class GameManager : MonoBehaviour
 	public bool Paused;
 	private float m_ElapsedGameTime;
 	private float m_ElapsedRealTime;
+	public List<HighScore> HighScores;
 
 	[Header("Slowdown Settings")]
 	[SerializeField] private float slowTimeScale;
@@ -27,8 +34,13 @@ public class GameManager : MonoBehaviour
 	[Header("UI Stuff")]
 	public Text ScoreText;
 	public Text FinalScoreText;
+	public Text FinalScoreTextQuit;
 	public GameObject GameOverScreen;
 	public GameObject PausedScreen;
+	public GameObject QuitScreen;
+	public bool IsMainMenu;
+	public InputField NameInputFieldGameOver;
+	public InputField NameInputFieldQuit;
 
 	public int BuildingCount
 	{
@@ -44,15 +56,64 @@ public class GameManager : MonoBehaviour
 		GameOver = false;
 		TargettingNodes = transform.Find("TargettingNodes");
 		BuildingsParent = transform.Find("Buildings");
+		LoadHighScores();
+	}
+
+	/// <summary>
+	/// Read in current high scores from player prefs
+	/// </summary>
+	public void LoadHighScores()
+	{
+		HighScores = new List<HighScore>();
+		for (int i = 0; i < 10; i++)
+		{
+			HighScore score = new HighScore();
+			score.name = PlayerPrefs.GetString("HighScoreName_" + i, "None");
+			score.score = PlayerPrefs.GetInt("HighScoreValue_" + i, 0);
+			HighScores.Add(score);
+		}
+	}
+
+	/// <summary>
+	/// Save current high scores to player prefs
+	/// </summary>
+	public void SaveHighScores()
+	{
+		for (int i = 0; i < 10; i++)
+		{
+			HighScore score = HighScores[i];
+			PlayerPrefs.SetString("HighScoreName_" + i, score.name);
+			PlayerPrefs.SetInt("HighScoreValue_" + i, score.score);
+		}
+	}
+
+	/// <summary>
+	/// See if the given high score can take a place
+	/// </summary>
+	public void InsertHighScore(HighScore _score)
+	{
+		for (int i = 0; i < 10; i++)
+		{
+			HighScore otherScore = HighScores[i];
+			if (_score.score > otherScore.score)
+			{
+				HighScores.Insert(i, _score);
+				HighScores.RemoveAt(10);
+				return;
+			}
+		}
 	}
 
 	// Update is called once per frame
 	void Update()
 	{
-		UpdateTimers();
-		UpdateSlowDown();
-		UpdateGameOver();
-		UpdatePaused();
+		if (!IsMainMenu)
+		{
+			UpdateTimers();
+			UpdateSlowDown();
+			UpdateGameOver();
+			UpdatePaused();
+		}
 	}
 
 	/// <summary>
@@ -136,11 +197,22 @@ public class GameManager : MonoBehaviour
 		ScoreText.text = "" + score;
 	}
 
+	public void PlayAgain()
+	{
+		HighScore finalScore = new HighScore();
+		finalScore.name = NameInputFieldGameOver.text;
+		finalScore.score = score;
+		InsertHighScore(finalScore);
+		SaveHighScores();
+		Restart();
+	}
+
 	/// <summary>
 	/// Restarts the scene.
 	/// </summary>
 	public void Restart()
 	{
+		Time.timeScale = 1f;
 		SceneManager.LoadScene(SceneManager.GetActiveScene().name);
 	}
 
@@ -161,5 +233,29 @@ public class GameManager : MonoBehaviour
 			Paused = true;
 			PausedScreen.SetActive(true);
 		}
+	}
+
+	public void VerifyQuit()
+	{
+		FinalScoreTextQuit.text = "Score: " + score;
+		QuitScreen.SetActive(true);
+		PausedScreen.SetActive(false);
+	}
+
+	public void UndoQuit()
+	{
+		QuitScreen.SetActive(false);
+		PausedScreen.SetActive(true);
+	}
+
+	public void ReturnToMenu()
+	{
+		Time.timeScale = 1f;
+		HighScore finalScore = new HighScore();
+		finalScore.name = NameInputFieldQuit.text;
+		finalScore.score = score;
+		InsertHighScore(finalScore);
+		SaveHighScores();
+		SceneManager.LoadScene("MainMenu");
 	}
 }

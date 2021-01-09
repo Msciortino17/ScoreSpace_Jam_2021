@@ -177,6 +177,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 34d016817cdab1448ae94183f9d5c167, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  damageSound: {fileID: 0}
   healthText: {fileID: 2210863052406171572}
   Health: 500
 --- !u!65 &4363622466235601293
@@ -266,7 +267,7 @@ Canvas:
   m_SortingBucketNormalizedSize: 0
   m_AdditionalShaderChannelsFlag: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 10
+  m_SortingOrder: 7
   m_TargetDisplay: 0
 --- !u!114 &1387907609323732558
 MonoBehaviour:
