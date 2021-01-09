@@ -9,6 +9,7 @@ public class TargetNode : MonoBehaviour
 	public Cannon MyCannon;
 	public float TimeToSelect;
 	public TargetNode NextNode;
+	public float ProgressOnLink;
 
 	// Start is called before the first frame update
 	void Start()
@@ -23,7 +24,7 @@ public class TargetNode : MonoBehaviour
 		timeLeft -= Time.unscaledDeltaTime;
 		if (timeLeft <= 0f)
 		{
-			MyCannon.FailedTarget();
+			MyCannon.FailedTarget(ProgressOnLink);
 		}
 		//UpdateSize();
 	}
@@ -62,7 +63,7 @@ public class TargetNode : MonoBehaviour
 		{
 			if (NextNode == null)
 			{
-				MyCannon.FinalizeTarget();
+				MyCannon.SuccessfulTarget();
 			}
 			else
 			{

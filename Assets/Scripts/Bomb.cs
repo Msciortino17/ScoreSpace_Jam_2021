@@ -4,6 +4,11 @@ using UnityEngine;
 
 public class Bomb : MonoBehaviour
 {
+	public bool Teleporting;
+	private ParticleSystem myParticleSystem;
+	private SpriteRenderer mySpriteRenderer;
+
+	public GameManager gameManager;
 	public delegate void ExplodeCallback();
 	public ExplodeCallback MyExplodeCallback;
 
@@ -30,21 +35,36 @@ public class Bomb : MonoBehaviour
 	// Start is called before the first frame update
 	void Start()
 	{
+		myParticleSystem = GetComponent<ParticleSystem>();
+		mySpriteRenderer = GetComponent<SpriteRenderer>();
 		timer = 0f;
+		Teleporting = true;
 	}
 
 	// Update is called once per frame
 	void Update()
 	{
-		timer += Time.deltaTime;
-		if (timer > explodeTime)
+		if (Teleporting)
 		{
-			Explode();
+			if (!myParticleSystem.isPlaying)
+			{
+				Teleporting = false;
+				mySpriteRenderer.enabled = true;
+				gameManager.NormalizeTime();
+			}
+		}
+		else
+		{
+			timer += Time.deltaTime;
+			if (timer > explodeTime)
+			{
+				Explode();
+			}
 		}
 	}
 
 	/// <summary>
-	/// Detonates the bomb, spawning the explosion.
+	/// Blows up the bomb, spawning the explosion.
 	/// </summary>
 	public void Explode()
 	{
@@ -52,5 +72,14 @@ public class Bomb : MonoBehaviour
 		Explosion explosion = Instantiate(explosionPrefab, transform.position, Quaternion.identity).GetComponent<Explosion>();
 		explosion.Damage = Damage;
 		MyExplodeCallback?.Invoke();
+	}
+
+	/// <summary>
+	/// Maxes out timer so it'll explode right away.
+	/// Main use is that if this is called while teleporting, the teleport effect will finish, then it will explode.
+	/// </summary>
+	public void Detonate()
+	{
+		timer = explodeTime;
 	}
 }

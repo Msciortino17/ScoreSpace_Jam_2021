@@ -336,7 +336,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ef3e356d0d1a4d47b874051b819f611, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scoreGranted: 10
+  scoreGranted: 50
   GameManager: {fileID: 0}
   healthText: {fileID: 1815631031}
   Health: 100

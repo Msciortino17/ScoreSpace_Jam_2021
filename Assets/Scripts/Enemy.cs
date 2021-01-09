@@ -116,7 +116,7 @@ public class Enemy : MonoBehaviour
 			if (bomb.EarlyCheck)
 			{
 				bomb.MyExplodeCallback += Kill;
-				bomb.Explode();
+				bomb.Detonate();
 			}
 		}
 
