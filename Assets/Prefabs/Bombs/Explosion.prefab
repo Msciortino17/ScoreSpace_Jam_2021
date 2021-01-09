@@ -4897,5 +4897,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 39ad0278abeb92c4a9b7afc2552a40b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  explosionPrefabs:
+  - {fileID: 2078579042963834134, guid: bf335da263fa3854cbcb7dce5bd7c2b4, type: 3}
+  - {fileID: 1260403950878722511, guid: bc4d6af8fa08b1f4cbae2e5127892f09, type: 3}
+  - {fileID: 411720339277370534, guid: d7a21377dc4d94543a33a71317824e9d, type: 3}
+  - {fileID: 2278304798390319944, guid: 4de7b8f1dc742e84b9ad688827cc66a2, type: 3}
+  - {fileID: 1731006780003200870, guid: bef37372f2779c64fa308635832b5c26, type: 3}
+  - {fileID: 9170404630521821296, guid: c1f4a0afd1ba90844a0efec81dd19f75, type: 3}
+  - {fileID: 5688988101279522713, guid: 0d728adbfd7f7fe4e8b7f19a2616fb80, type: 3}
+  - {fileID: 7485005219737180437, guid: fc57276e570b63c49a7bad6e07bc89e0, type: 3}
   lingerTime: 0.5
   Damage: 0

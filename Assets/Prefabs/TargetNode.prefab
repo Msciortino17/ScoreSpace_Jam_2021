@@ -109,6 +109,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7572e787ae5e00342804e7b905db7dcb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  targettingSoundPrefab: {fileID: 5001973177321579387, guid: 58bf770789aa5c54d8d32c21ab9107dd, type: 3}
   MyCannon: {fileID: 0}
   TimeToSelect: 0
   NextNode: {fileID: 0}

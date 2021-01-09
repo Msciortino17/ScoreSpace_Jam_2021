@@ -129,7 +129,7 @@ public class Cannon : MonoBehaviour
 
 			node.transform.position = position;
 			node.ProgressOnLink = distanceRatio;
-			node.TimeToSelect = 1f * (distanceRatio + 0.1f);
+			node.TimeToSelect = 1f * (distanceRatio + 0.2f);
 			linePositions.Add(position);
 		}
 

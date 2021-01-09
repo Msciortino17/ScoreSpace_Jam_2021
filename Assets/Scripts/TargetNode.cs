@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class TargetNode : MonoBehaviour
 {
+	[SerializeField] private GameObject targettingSoundPrefab;
 	private float timeLeft;
 	private float startingScale;
 	public Cannon MyCannon;
@@ -71,6 +72,8 @@ public class TargetNode : MonoBehaviour
 				Destroy(gameObject);
 				MyCannon.SetTargettingLineProgress(MyCannon.TargettingLineProgress + MyCannon.TargettingLineProgressAmount);
 			}
+			SoundEffect sound = Instantiate(targettingSoundPrefab).GetComponent<SoundEffect>();
+			sound.MyAudioSource.pitch = (1f - ProgressOnLink) + 1f;
 		}
 	}
 }

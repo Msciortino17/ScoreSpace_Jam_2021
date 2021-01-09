@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 public class Building : MonoBehaviour
 {
+	[SerializeField] private AudioSource damageSound;
 	[SerializeField] private Text healthText;
 
 	public float Health;
@@ -34,6 +35,11 @@ public class Building : MonoBehaviour
 			Explosion explosion = other.GetComponent<Explosion>();
 			Health -= explosion.Damage;
 			healthText.text = "" + (int)Health;
+
+			if (!damageSound.isPlaying)
+			{
+				damageSound.Play();
+			}
 		}
 	}
 
@@ -44,6 +50,11 @@ public class Building : MonoBehaviour
 			Enemy enemy = other.gameObject.GetComponent<Enemy>();
 			Health -= enemy.Damage * Time.deltaTime;
 			healthText.text = "" + (int)Health;
+
+			if (!damageSound.isPlaying)
+			{
+				damageSound.Play();
+			}
 		}
 	}
 

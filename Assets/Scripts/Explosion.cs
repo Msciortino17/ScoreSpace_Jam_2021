@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Explosion : MonoBehaviour
 {
+	[SerializeField] private GameObject[] explosionPrefabs;
 	[SerializeField] private float lingerTime;
 	private float timer;
 
@@ -13,6 +14,8 @@ public class Explosion : MonoBehaviour
 	void Start()
 	{
 		timer = lingerTime;
+		GameObject explosionPrefab = explosionPrefabs[Random.Range(0, explosionPrefabs.Length)];
+		Instantiate(explosionPrefab);
 	}
 
 	// Update is called once per frame
