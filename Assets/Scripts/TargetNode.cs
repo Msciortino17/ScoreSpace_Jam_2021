@@ -22,10 +22,13 @@ public class TargetNode : MonoBehaviour
 	// Update is called once per frame
 	void Update()
 	{
-		timeLeft -= Time.unscaledDeltaTime;
-		if (timeLeft <= 0f)
+		if (!MyCannon.MyGameManager.Paused)
 		{
-			MyCannon.FailedTarget(ProgressOnLink);
+			timeLeft -= Time.unscaledDeltaTime;
+			if (timeLeft <= 0f)
+			{
+				MyCannon.FailedTarget(ProgressOnLink);
+			}
 		}
 		//UpdateSize();
 	}

@@ -8,6 +8,9 @@ public class Cannon : MonoBehaviour
 	public GameManager MyGameManager;
 	[SerializeField] Transform textSpawnLocation;
 	[SerializeField] ParticleSystem targetLocationCursor;
+	private SpriteRenderer barrelRenderer;
+	[SerializeField] private Color colorPurple;
+	[SerializeField] private Color colorYellow;
 	private bool shooting;
 	private Vector3 targetLocation;
 
@@ -17,7 +20,7 @@ public class Cannon : MonoBehaviour
 	public string[] TargettingLineResults;
 
 	[Header("Settings")]
-	private float coolDownTime;
+	[SerializeField] private float coolDownTime;
 	private float coolDownTimer;
 
 	[Header("Prefabs")]
@@ -30,6 +33,7 @@ public class Cannon : MonoBehaviour
 	{
 		mainCamera = Camera.main;
 		MyGameManager = transform.parent.GetComponent<GameManager>();
+		barrelRenderer = transform.Find("Barrel").GetComponent<SpriteRenderer>();
 	}
 
 	// Update is called once per frame
@@ -46,7 +50,7 @@ public class Cannon : MonoBehaviour
 	{
 		Vector3 mousePos = GetMousePos();
 		// Place bombs
-		if (Input.GetKeyDown(KeyCode.Mouse0) && coolDownTimer <= 0f && !shooting)
+		if (Input.GetKeyDown(KeyCode.Mouse0) && coolDownTimer <= 0f && !shooting && !MyGameManager.Paused)
 		{
 			coolDownTimer = coolDownTime;
 			shooting = true;
@@ -55,6 +59,17 @@ public class Cannon : MonoBehaviour
 			targetLocationCursor.Play();
 			MyGameManager.SlowDownTime();
 			BeginTargetting();
+			barrelRenderer.color = colorYellow;
+		}
+
+		if (coolDownTimer > 0f)
+		{
+			float ratio = coolDownTimer / coolDownTime;
+			barrelRenderer.color = Color.Lerp(colorPurple, colorYellow, ratio);
+		}
+		else
+		{
+			barrelRenderer.color = colorPurple;
 		}
 
 		// Look at the mouse
@@ -125,7 +140,9 @@ public class Cannon : MonoBehaviour
 			// Add a simple sin wave
 			float waveDistance = 1f;
 			float angle = distanceRatio * 360f * Mathf.Deg2Rad;
-			position += new Vector3(toTargetPerp.x * Mathf.Sin(angle) * waveDistance, toTargetPerp.y * Mathf.Sin(angle) * waveDistance, 0f);
+			Vector3 offset = new Vector3(toTargetPerp.x * Mathf.Sin(angle) * waveDistance, toTargetPerp.y * Mathf.Sin(angle) * waveDistance, 0f);
+			//position += (Random.Range(0, 2) == 0) ? offset : -offset;
+			position += offset;
 
 			node.transform.position = position;
 			node.ProgressOnLink = distanceRatio;

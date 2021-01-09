@@ -8,9 +8,9 @@ public class GameManager : MonoBehaviour
 {
 	private int score;
 	private bool GameOver;
+	public bool Paused;
 	private float m_ElapsedGameTime;
 	private float m_ElapsedRealTime;
-
 
 	[Header("Slowdown Settings")]
 	[SerializeField] private float slowTimeScale;
@@ -28,6 +28,7 @@ public class GameManager : MonoBehaviour
 	public Text ScoreText;
 	public Text FinalScoreText;
 	public GameObject GameOverScreen;
+	public GameObject PausedScreen;
 
 	public int BuildingCount
 	{
@@ -51,6 +52,7 @@ public class GameManager : MonoBehaviour
 		UpdateTimers();
 		UpdateSlowDown();
 		UpdateGameOver();
+		UpdatePaused();
 	}
 
 	/// <summary>
@@ -60,6 +62,17 @@ public class GameManager : MonoBehaviour
 	{
 		m_ElapsedGameTime += Time.deltaTime;
 		m_ElapsedRealTime += Time.unscaledDeltaTime;
+	}
+
+	/// <summary>
+	/// Checks for input to pause/unpause the game.
+	/// </summary>
+	private void UpdatePaused()
+	{
+		if (Input.GetKeyDown(KeyCode.Escape))
+		{
+			TogglePause();
+		}
 	}
 
 	/// <summary>
@@ -129,5 +142,24 @@ public class GameManager : MonoBehaviour
 	public void Restart()
 	{
 		SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+	}
+
+	/// <summary>
+	/// Toggles pause.
+	/// </summary>
+	public void TogglePause()
+	{
+		if (Paused)
+		{
+			Time.timeScale = TimeIsSlow ? slowTimeScale : 1f;
+			Paused = false;
+			PausedScreen.SetActive(false);
+		}
+		else
+		{
+			Time.timeScale = 0f;
+			Paused = true;
+			PausedScreen.SetActive(true);
+		}
 	}
 }
