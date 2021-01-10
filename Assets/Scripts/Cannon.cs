@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class Cannon : MonoBehaviour
 {
@@ -39,7 +40,7 @@ public class Cannon : MonoBehaviour
 	// Update is called once per frame
 	void Update()
 	{
-		if (!MyGameManager.IsMainMenu)
+		if (!MyGameManager.IsMainMenu || MyGameManager.TutorialStep >= 1)
 		{
 			UpdateInput();
 			UpdateTimers();
@@ -55,6 +56,12 @@ public class Cannon : MonoBehaviour
 		// Place bombs
 		if (Input.GetKeyDown(KeyCode.Mouse0) && coolDownTimer <= 0f && !shooting && !MyGameManager.Paused)
 		{
+			GameObject hover = EventSystem.current.currentSelectedGameObject;
+			if (hover != null && hover.name == "ButtonOk")
+			{
+				return;
+			}
+
 			coolDownTimer = coolDownTime;
 			shooting = true;
 			targetLocation = mousePos;
@@ -110,7 +117,6 @@ public class Cannon : MonoBehaviour
 	/// </summary>
 	public void BeginTargetting()
 	{
-
 		List<Vector3> linePositions = new List<Vector3>();
 		Vector3 toTarget = targetLocation - transform.position;
 		float distance = toTarget.magnitude;
@@ -120,10 +126,11 @@ public class Cannon : MonoBehaviour
 		TargetNode firstNode = null;
 		TargetNode lastNode = null;
 		int numNodes = 10;
+		bool flipped = (Random.Range(0, 2) == 0);
 		for (int i = 0; i < numNodes; i++)
 		{
 			// Standard node init
-			TargetNode node = Instantiate(targetNodePrefab, MyGameManager.TargettingNodes).GetComponent<TargetNode>(); // should be batching this buuut...
+			TargetNode node = Instantiate(targetNodePrefab, MyGameManager.TargettingNodes).GetComponent<TargetNode>();
 			node.MyCannon = this;
 			if (lastNode != null)
 			{
@@ -141,11 +148,11 @@ public class Cannon : MonoBehaviour
 			Vector3 position = new Vector3(toTarget.x * distance * distanceRatio, toTarget.y * distance * distanceRatio);
 
 			// Add a simple sin wave
-			float waveDistance = 1f;
+			float waveDistance = 1.5f;
 			float angle = distanceRatio * 360f * Mathf.Deg2Rad;
 			Vector3 offset = new Vector3(toTargetPerp.x * Mathf.Sin(angle) * waveDistance, toTargetPerp.y * Mathf.Sin(angle) * waveDistance, 0f);
-			//position += (Random.Range(0, 2) == 0) ? offset : -offset;
-			position += offset;
+			position += flipped ? offset : -offset;
+			//position += offset;
 
 			node.transform.position = position;
 			node.ProgressOnLink = distanceRatio;
@@ -170,31 +177,21 @@ public class Cannon : MonoBehaviour
 	/// </summary>
 	public void SetTargettingLineProgress(float _middleTime)
 	{
-		float adjustedTime = _middleTime;
-		if (adjustedTime < 0.2f)
-		{
-			adjustedTime = 0.2f;
-		}
-		if (adjustedTime > 0.8f)
-		{
-			adjustedTime = 0.8f;
-		}
-
 		Gradient gradient = TargettingLine.colorGradient;
 		GradientAlphaKey[] alphaKeys = gradient.alphaKeys;
-		alphaKeys[1].time = adjustedTime - 0.2f;
-		alphaKeys[2].time = adjustedTime - 0.1f;
+		alphaKeys[1].time = Mathf.Max(_middleTime - 0.2f, 0f);
+		alphaKeys[2].time = Mathf.Max(_middleTime - 0.1f, 0f);
 		alphaKeys[3].time = _middleTime;
-		alphaKeys[4].time = adjustedTime + 0.1f;
-		alphaKeys[5].time = adjustedTime + 0.2f;
+		alphaKeys[4].time = Mathf.Min(_middleTime + 0.1f, 1f);
+		alphaKeys[5].time = Mathf.Min(_middleTime + 0.2f, 1f);
 		gradient.SetKeys(gradient.colorKeys, alphaKeys);
 		TargettingLine.colorGradient = gradient;
 
 		AnimationCurve widthCurve = TargettingLine.widthCurve;
 		Keyframe[] keys = widthCurve.keys;
-		keys[1].time = adjustedTime - 0.15f;
-		keys[2].time = adjustedTime;
-		keys[3].time = adjustedTime + 0.15f;
+		keys[1].time = Mathf.Max(_middleTime - 0.15f, 0f);
+		keys[2].time = _middleTime;
+		keys[3].time = Mathf.Min(_middleTime + 0.15f, 1f);
 		widthCurve.keys = keys;
 		TargettingLine.widthCurve = widthCurve;
 
@@ -208,7 +205,7 @@ public class Cannon : MonoBehaviour
 	{
 		MyGameManager.NormalizeTime();
 		Bomb bomb = SpawnBomb(bombPrefab, targetLocation);
-		float offSetRange = 6f * _distance;
+		float offSetRange = 3f * (_distance + 0.15f);
 		float x = Random.Range(-offSetRange, offSetRange);
 		float y = Random.Range(-offSetRange, offSetRange);
 		bomb.transform.Translate(x, y, 0f);
@@ -255,6 +252,7 @@ public class Cannon : MonoBehaviour
 		ParticleText text = Instantiate(particleTextPrefab, textSpawnLocation.position, Quaternion.identity).GetComponent<ParticleText>();
 		text.SetText(TargettingLineResults[3]);
 		targetLocationCursor.Stop();
+		coolDownTimer = 0f;
 	}
 
 	/// <summary>

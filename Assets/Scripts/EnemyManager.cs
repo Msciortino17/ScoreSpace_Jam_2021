@@ -4,15 +4,20 @@ using UnityEngine;
 
 public class EnemyManager : MonoBehaviour
 {
+	private int totalEnemiesSpawned;
 	private GameManager gameManager;
+	private Transform spawnersParent;
 	private List<Transform> enemySpawners;
 
 	[Header("Spawn Settings")]
 	[SerializeField] private float spawnRate;
+	[SerializeField] private int maxEnemies;
 	private float spawnTimer;
+	[SerializeField] private float spawnerSpinRate;
 
 	[Header("Prefabs")]
 	[SerializeField] private GameObject enemyPrefab;
+	[SerializeField] private GameObject enemyPrefab2;
 
 	/// <summary>
 	/// Let's us know how many enemies there are.
@@ -39,7 +44,7 @@ public class EnemyManager : MonoBehaviour
 	private void LoadSpawners()
 	{
 		enemySpawners = new List<Transform>();
-		Transform spawnersParent = transform.Find("EnemySpawners");
+		spawnersParent = transform.Find("EnemySpawners");
 		foreach (Transform spawner in spawnersParent)
 		{
 			enemySpawners.Add(spawner);
@@ -49,9 +54,10 @@ public class EnemyManager : MonoBehaviour
 	// Update is called once per frame
 	void Update()
 	{
-		if (!gameManager.IsMainMenu)
+		if (!gameManager.IsMainMenu || gameManager.TutorialStep >= 0)
 		{
 			UpdateSpawnEnemies();
+			SpinSpawners();
 		}
 	}
 
@@ -61,20 +67,41 @@ public class EnemyManager : MonoBehaviour
 	private void UpdateSpawnEnemies()
 	{
 		spawnTimer -= Time.deltaTime;
-		if (spawnTimer <= 0f && EnemyCount < 5)
+		if (spawnTimer <= 0f && EnemyCount < maxEnemies * gameManager.DifficultyModifier)
 		{
-			SpawnEnemy();
-			spawnTimer = spawnRate;
+			totalEnemiesSpawned++;
+			int type = 1;
+			if (totalEnemiesSpawned % 5 == 0)
+			{
+				type = 2;
+			}
+			SpawnEnemy(type);
+			spawnTimer = spawnRate / gameManager.DifficultyModifier;
 		}
+	}
+
+	/// <summary>
+	/// Spins the spawners around, mixing up their positions a bit more.
+	/// </summary>
+	private void SpinSpawners()
+	{
+		spawnersParent.transform.Rotate(0f, 0f, spawnerSpinRate * Time.deltaTime);
 	}
 
 	/// <summary>
 	/// Will spawn an enemy at a random spawner.
 	/// </summary>
-	private void SpawnEnemy()
+	private void SpawnEnemy(int _type)
 	{
 		Transform spawner = enemySpawners[Random.Range(0, enemySpawners.Count)];
-		Enemy enemy = Instantiate(enemyPrefab, transform).GetComponent<Enemy>();
+
+		GameObject prefab = enemyPrefab;
+		if (_type == 2)
+		{
+			prefab = enemyPrefab2;
+		}
+
+		Enemy enemy = Instantiate(prefab, transform).GetComponent<Enemy>();
 		enemy.transform.position = spawner.position;
 		enemy.MyGameManager = gameManager;
 	}

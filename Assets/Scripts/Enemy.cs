@@ -14,12 +14,17 @@ public class Enemy : MonoBehaviour
 	public float Damage;
 
 	[Header("Movement Settings")]
+	[SerializeField] private float farOrbitRange;
 	[SerializeField] private float orbitRange;
 	[SerializeField] private float attackRange;
 	[SerializeField] private float moveSpeed;
 	[SerializeField] private float spriteRotateSpeed;
+	[SerializeField] private bool bounces;
 	private bool attacking;
+	private bool fallback;
+	private bool flipped;
 	private float behaviorTimer;
+	[SerializeField] private float behaviorTime;
 
 	[Header("Pefabs")]
 	[SerializeField] private GameObject DeathExplosion;
@@ -29,6 +34,7 @@ public class Enemy : MonoBehaviour
 	{
 		healthText.text = "" + (int)Health;
 		mySprite = transform.Find("Sprite");
+		flipped = Random.Range(0, 2) == 0;
 	}
 
 	// Update is called once per frame
@@ -59,6 +65,7 @@ public class Enemy : MonoBehaviour
 		Vector3 toCenter = Vector3.zero - transform.position;
 		float distance = toCenter.magnitude;
 		float range = attacking ? attackRange : orbitRange;
+		range = fallback ? farOrbitRange : range;
 
 		// Move to the correct range, and orbit when in range
 		if (distance > range + 0.1f)
@@ -72,6 +79,10 @@ public class Enemy : MonoBehaviour
 		else
 		{
 			Vector3 orbitDirection = Vector2.Perpendicular(toCenter);
+			if (flipped)
+			{
+				orbitDirection *= -1f;
+			}
 			transform.Translate(orbitDirection.normalized * moveSpeed * Time.deltaTime);
 		}
 
@@ -79,10 +90,22 @@ public class Enemy : MonoBehaviour
 		behaviorTimer -= Time.deltaTime;
 		if (behaviorTimer <= 0f)
 		{
-			behaviorTimer = 1f;
-			if (Random.Range(0,3) == 0)
+			behaviorTimer = behaviorTime;
+			int decision = Random.Range(0, 3);
+			if (decision == 0)
 			{
-				attacking = !attacking;
+				attacking = false;
+				fallback = false;
+			}
+			else if (decision == 1)
+			{
+				attacking = false;
+				fallback = true;
+			}
+			else
+			{
+				attacking = true;
+				fallback = false;
 			}
 		}
 	}
@@ -130,6 +153,14 @@ public class Enemy : MonoBehaviour
 			{
 				Kill();
 			}
+		}
+	}
+
+	private void OnCollisionEnter(Collision collision)
+	{
+		if (collision.gameObject.CompareTag("Enemy") && bounces)
+		{
+			flipped = !flipped;
 		}
 	}
 }

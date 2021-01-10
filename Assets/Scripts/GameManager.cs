@@ -13,11 +13,11 @@ public struct HighScore
 public class GameManager : MonoBehaviour
 {
 	private int score;
-	private bool GameOver;
 	public bool Paused;
 	private float m_ElapsedGameTime;
 	private float m_ElapsedRealTime;
 	public List<HighScore> HighScores;
+	public int TutorialStep;
 
 	[Header("Slowdown Settings")]
 	[SerializeField] private float slowTimeScale;
@@ -50,10 +50,25 @@ public class GameManager : MonoBehaviour
 		}
 	}
 
+	public int DifficultyModifier
+	{
+		get
+		{
+			if (m_ElapsedGameTime > 90f)
+			{
+				return 3;
+			}
+			else if (m_ElapsedGameTime > 30f)
+			{
+				return 2;
+			}
+			return 1;
+		}
+	}
+
 	// Start is called before the first frame update
 	void Start()
 	{
-		GameOver = false;
 		TargettingNodes = transform.Find("TargettingNodes");
 		BuildingsParent = transform.Find("Buildings");
 		LoadHighScores();
@@ -82,7 +97,7 @@ public class GameManager : MonoBehaviour
 		for (int i = 0; i < 10; i++)
 		{
 			HighScore score = HighScores[i];
-			PlayerPrefs.SetString("HighScoreName_" + i, score.name);
+			PlayerPrefs.SetString("HighScoreName_" + i, string.IsNullOrEmpty(score.name) ? "Unnamed" : score.name);
 			PlayerPrefs.SetInt("HighScoreValue_" + i, score.score);
 		}
 	}
@@ -110,10 +125,10 @@ public class GameManager : MonoBehaviour
 		if (!IsMainMenu)
 		{
 			UpdateTimers();
-			UpdateSlowDown();
 			UpdateGameOver();
 			UpdatePaused();
 		}
+		UpdateSlowDown();
 	}
 
 	/// <summary>
@@ -161,7 +176,6 @@ public class GameManager : MonoBehaviour
 		if (BuildingCount <= 0)
 		{
 			Time.timeScale = 0f;
-			GameOver = true;
 			GameOverScreen.SetActive(true);
 			FinalScoreText.text = "Score: " + score;
 		}
@@ -194,6 +208,12 @@ public class GameManager : MonoBehaviour
 	public void IncreaseScore(int _amount)
 	{
 		score += _amount;
+		ScoreText.text = "" + score;
+	}
+
+	public void ResetScore()
+	{
+		score = 0;
 		ScoreText.text = "" + score;
 	}
 

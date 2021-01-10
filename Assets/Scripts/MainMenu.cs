@@ -27,6 +27,12 @@ public class MainMenu : MonoBehaviour
 	[SerializeField] private GameObject creditsMenu;
 	[SerializeField] private Text highScoreText;
 
+	[Header("Tutorial Stuff")]
+	public List<GameObject> TutorialSteps = new List<GameObject>();
+	public GameObject Buildings;
+	public GameObject Enemies;
+	public GameObject ScoreText;
+
 	// Start is called before the first frame update
 	void Start()
 	{
@@ -49,6 +55,26 @@ public class MainMenu : MonoBehaviour
 
 	}
 
+	public void TutorialNextStep()
+	{
+		gameManager.ResetScore();
+		gameManager.TutorialStep++;
+		if (gameManager.TutorialStep >= 7)
+		{
+			ToggleHowToPlay();
+			return;
+		}
+
+		for (int i = 0; i < TutorialSteps.Count; i++)
+		{
+			TutorialSteps[i].SetActive(i == gameManager.TutorialStep);
+		}
+
+		Buildings.SetActive(gameManager.TutorialStep >= 3);
+		Enemies.SetActive(gameManager.TutorialStep >= 4);
+		ScoreText.SetActive(gameManager.TutorialStep >= 6);
+	}
+
 	public void Play()
 	{
 		Instantiate(Feedback1Prefab);
@@ -57,6 +83,9 @@ public class MainMenu : MonoBehaviour
 
 	public void ToggleHowToPlay()
 	{
+		gameManager.TutorialStep = -1;
+		TutorialNextStep();
+
 		howToPlayMenu.SetActive(!howToPlayMenu.activeInHierarchy);
 		mainMenu.SetActive(!mainMenu.activeInHierarchy);
 		bool returning = mainMenu.activeInHierarchy;
