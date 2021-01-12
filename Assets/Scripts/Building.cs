@@ -5,6 +5,8 @@ using UnityEngine.UI;
 
 public class Building : MonoBehaviour
 {
+	[SerializeField] private GameManager gameManager;
+	[SerializeField] private ParticleSystem damageParticles;
 	[SerializeField] private AudioSource damageSound;
 	[SerializeField] private Text healthText;
 
@@ -55,19 +57,13 @@ public class Building : MonoBehaviour
 			{
 				damageSound.Play();
 			}
-		}
-	}
 
-	/// <summary>
-	/// When an enemy is overlapping the building, apply damage
-	/// </summary>
-	private void OnCollisionStay(Collision collision)
-	{
-		if (collision.gameObject.CompareTag("Enemy"))
-		{
-			Enemy enemy = collision.gameObject.GetComponent<Enemy>();
-			Health -= enemy.Damage * Time.deltaTime;
-			healthText.text = "" + (int)Health;
+			if (!damageParticles.isPlaying)
+			{
+				damageParticles.Play();
+			}
+
+			gameManager.MyCameraController.TriggerShake(0.75f, 0.75f, 0.1f);
 		}
 	}
 }

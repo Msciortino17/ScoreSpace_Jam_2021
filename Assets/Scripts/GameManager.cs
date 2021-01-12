@@ -18,6 +18,7 @@ public class GameManager : MonoBehaviour
 	private float m_ElapsedRealTime;
 	public List<HighScore> HighScores;
 	public int TutorialStep;
+	public bool GameOver;
 
 	[Header("Slowdown Settings")]
 	[SerializeField] private float slowTimeScale;
@@ -63,6 +64,17 @@ public class GameManager : MonoBehaviour
 				return 2;
 			}
 			return 1;
+
+			// For testing
+			//if (m_ElapsedGameTime > 20f)
+			//{
+			//	return 3;
+			//}
+			//else if (m_ElapsedGameTime > 10f)
+			//{
+			//	return 2;
+			//}
+			//return 1;
 		}
 	}
 
@@ -175,6 +187,7 @@ public class GameManager : MonoBehaviour
 	{
 		if (BuildingCount <= 0)
 		{
+			GameOver = true;
 			Time.timeScale = 0f;
 			GameOverScreen.SetActive(true);
 			FinalScoreText.text = "Score: " + score;
@@ -224,7 +237,7 @@ public class GameManager : MonoBehaviour
 		finalScore.score = score;
 		InsertHighScore(finalScore);
 		SaveHighScores();
-		Restart();
+		SceneManager.LoadScene("MainMenu");
 	}
 
 	/// <summary>
@@ -260,6 +273,7 @@ public class GameManager : MonoBehaviour
 		FinalScoreTextQuit.text = "Score: " + score;
 		QuitScreen.SetActive(true);
 		PausedScreen.SetActive(false);
+		GameOverScreen.SetActive(false);
 	}
 
 	public void UndoQuit()

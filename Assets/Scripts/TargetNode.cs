@@ -63,7 +63,7 @@ public class TargetNode : MonoBehaviour
 	/// </summary>
 	private void CursorCollision(Collider _other)
 	{
-		if (_other.CompareTag("Cursor") && Input.GetKey(KeyCode.Mouse0))
+		if (_other.CompareTag("Cursor"))
 		{
 			if (NextNode == null)
 			{

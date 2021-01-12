@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class EnemyManager : MonoBehaviour
 {
+	private bool showEnemyHealth;
 	private int totalEnemiesSpawned;
 	private GameManager gameManager;
 	private Transform spawnersParent;
@@ -36,6 +37,7 @@ public class EnemyManager : MonoBehaviour
 	{
 		gameManager = transform.parent.GetComponent<GameManager>();
 		LoadSpawners();
+		showEnemyHealth = PlayerPrefs.GetInt("ShowEnemyHealth", 0) == 1;
 	}
 
 	/// <summary>
@@ -104,5 +106,6 @@ public class EnemyManager : MonoBehaviour
 		Enemy enemy = Instantiate(prefab, transform).GetComponent<Enemy>();
 		enemy.transform.position = spawner.position;
 		enemy.MyGameManager = gameManager;
+		enemy.HealthText.gameObject.SetActive(showEnemyHealth);
 	}
 }

@@ -5,26 +5,33 @@ using UnityEngine.UI;
 
 public class Enemy : MonoBehaviour
 {
-	private Transform mySprite;
+	[SerializeField] private ParticleSystem damagedParticles;
+	[SerializeField] private Color yellowColor;
+	[SerializeField] private Color orangeColor;
+	private SpriteRenderer mySprite;
 	[SerializeField] private int scoreGranted;
 	public GameManager MyGameManager;
-	[SerializeField] private Text healthText;
 
+	private float startHealth;
 	public float Health;
 	public float Damage;
+	public Text HealthText;
 
 	[Header("Movement Settings")]
+	private float currentRange;
 	[SerializeField] private float farOrbitRange;
 	[SerializeField] private float orbitRange;
 	[SerializeField] private float attackRange;
-	[SerializeField] private float moveSpeed;
+	private float currentMoveSpeed;
+	[SerializeField] private float minMoveSpeed;
+	[SerializeField] private float maxMoveSpeed;
+	private float startSpriteRotateSpeed;
 	[SerializeField] private float spriteRotateSpeed;
-	[SerializeField] private bool bounces;
-	private bool attacking;
-	private bool fallback;
+	[SerializeField] private float damagedSpriteRotateSpeed;
 	private bool flipped;
 	private float behaviorTimer;
 	[SerializeField] private float behaviorTime;
+	[SerializeField] private float attackTime;
 
 	[Header("Pefabs")]
 	[SerializeField] private GameObject DeathExplosion;
@@ -32,9 +39,11 @@ public class Enemy : MonoBehaviour
 	// Start is called before the first frame update
 	void Start()
 	{
-		healthText.text = "" + (int)Health;
-		mySprite = transform.Find("Sprite");
+		mySprite = transform.Find("Sprite").GetComponent<SpriteRenderer>();
 		flipped = Random.Range(0, 2) == 0;
+		startHealth = Health;
+		startSpriteRotateSpeed = spriteRotateSpeed;
+		currentMoveSpeed = Random.Range(minMoveSpeed, maxMoveSpeed);
 	}
 
 	// Update is called once per frame
@@ -52,7 +61,7 @@ public class Enemy : MonoBehaviour
 		Vector3 toCenter = Vector3.zero - transform.position;
 		if (toCenter.magnitude > 2f)
 		{
-			transform.Translate(toCenter.normalized * moveSpeed * Time.deltaTime);
+			transform.Translate(toCenter.normalized * currentMoveSpeed * Time.deltaTime);
 		}
 	}
 
@@ -64,49 +73,47 @@ public class Enemy : MonoBehaviour
 		// Calculate some info
 		Vector3 toCenter = Vector3.zero - transform.position;
 		float distance = toCenter.magnitude;
-		float range = attacking ? attackRange : orbitRange;
-		range = fallback ? farOrbitRange : range;
 
 		// Move to the correct range, and orbit when in range
-		if (distance > range + 0.1f)
+		if (distance > currentRange + 0.1f)
 		{
-			transform.Translate(toCenter.normalized * moveSpeed * Time.deltaTime);
+			transform.Translate(toCenter.normalized * currentMoveSpeed * Time.deltaTime);
 		}
-		else if (distance < range - 0.1f)
+		else if (distance < currentRange - 0.1f)
 		{
-			transform.Translate(toCenter.normalized * -moveSpeed * Time.deltaTime);
+			transform.Translate(toCenter.normalized * -currentMoveSpeed * Time.deltaTime);
 		}
 		else
 		{
+			behaviorTimer -= Time.deltaTime;
 			Vector3 orbitDirection = Vector2.Perpendicular(toCenter);
 			if (flipped)
 			{
 				orbitDirection *= -1f;
 			}
-			transform.Translate(orbitDirection.normalized * moveSpeed * Time.deltaTime);
+			transform.Translate(orbitDirection.normalized * currentMoveSpeed * Time.deltaTime);
 		}
 
 		// Every so often, change behavior
-		behaviorTimer -= Time.deltaTime;
 		if (behaviorTimer <= 0f)
 		{
 			behaviorTimer = behaviorTime;
 			int decision = Random.Range(0, 3);
 			if (decision == 0)
 			{
-				attacking = false;
-				fallback = false;
+				currentRange = Random.Range(orbitRange, farOrbitRange);
 			}
 			else if (decision == 1)
 			{
-				attacking = false;
-				fallback = true;
+				currentRange = farOrbitRange;
 			}
 			else
 			{
-				attacking = true;
-				fallback = false;
+				behaviorTimer = attackTime;
+				currentRange = attackRange;
 			}
+			flipped = Random.Range(0, 2) == 0;
+			currentMoveSpeed = Random.Range(minMoveSpeed, maxMoveSpeed);
 		}
 	}
 
@@ -115,7 +122,16 @@ public class Enemy : MonoBehaviour
 	/// </summary>
 	private void UpdateSpinEffect()
 	{
-		mySprite.transform.Rotate(0f, 0f, spriteRotateSpeed * Time.deltaTime);
+		mySprite.transform.Rotate(0f, 0f, spriteRotateSpeed * Time.deltaTime * (flipped ? 1 : -1));
+
+		if (spriteRotateSpeed > startSpriteRotateSpeed)
+		{
+			spriteRotateSpeed -= spriteRotateSpeed * Time.deltaTime;
+			if (spriteRotateSpeed < startSpriteRotateSpeed)
+			{
+				spriteRotateSpeed = startSpriteRotateSpeed;
+			}
+		}
 	}
 
 	/// <summary>
@@ -148,19 +164,27 @@ public class Enemy : MonoBehaviour
 		{
 			Explosion explosion = other.GetComponent<Explosion>();
 			Health -= explosion.Damage;
-			healthText.text = "" + (int)Health;
+			HealthText.text = "" + Health;
+			spriteRotateSpeed = damagedSpriteRotateSpeed;
+
+			float ratio = Health / startHealth;
+			Color newColor = Color.Lerp(yellowColor, orangeColor, ratio);
+			mySprite.color = newColor;
+			SpriteRenderer[] subSprites = mySprite.transform.GetComponentsInChildren<SpriteRenderer>();
+			foreach (SpriteRenderer sprite in subSprites)
+			{
+				sprite.color = newColor;
+			}
+
+			damagedParticles.Play();
+
+			behaviorTimer = behaviorTime;
+			currentRange = farOrbitRange;
+
 			if (Health <= 0)
 			{
 				Kill();
 			}
-		}
-	}
-
-	private void OnCollisionEnter(Collision collision)
-	{
-		if (collision.gameObject.CompareTag("Enemy") && bounces)
-		{
-			flipped = !flipped;
 		}
 	}
 }

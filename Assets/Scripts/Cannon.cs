@@ -19,6 +19,7 @@ public class Cannon : MonoBehaviour
 	public float TargettingLineProgress;
 	public float TargettingLineProgressAmount;
 	public string[] TargettingLineResults;
+	private AudioSource finishTargetSound;
 
 	[Header("Settings")]
 	[SerializeField] private float coolDownTime;
@@ -35,6 +36,7 @@ public class Cannon : MonoBehaviour
 		mainCamera = Camera.main;
 		MyGameManager = transform.parent.GetComponent<GameManager>();
 		barrelRenderer = transform.Find("Barrel").GetComponent<SpriteRenderer>();
+		finishTargetSound = GetComponent<AudioSource>();
 	}
 
 	// Update is called once per frame
@@ -125,7 +127,8 @@ public class Cannon : MonoBehaviour
 
 		TargetNode firstNode = null;
 		TargetNode lastNode = null;
-		int numNodes = 10;
+		int numNodes = Mathf.Min((int)(distance) + 7, 12);
+		float waveDistance = numNodes * 0.15f + Random.Range(-0.25f, 0.25f);
 		bool flipped = (Random.Range(0, 2) == 0);
 		for (int i = 0; i < numNodes; i++)
 		{
@@ -148,7 +151,6 @@ public class Cannon : MonoBehaviour
 			Vector3 position = new Vector3(toTarget.x * distance * distanceRatio, toTarget.y * distance * distanceRatio);
 
 			// Add a simple sin wave
-			float waveDistance = 1.5f;
 			float angle = distanceRatio * 360f * Mathf.Deg2Rad;
 			Vector3 offset = new Vector3(toTargetPerp.x * Mathf.Sin(angle) * waveDistance, toTargetPerp.y * Mathf.Sin(angle) * waveDistance, 0f);
 			position += flipped ? offset : -offset;
@@ -231,6 +233,7 @@ public class Cannon : MonoBehaviour
 		ParticleText text = Instantiate(particleTextPrefab, textSpawnLocation.position, Quaternion.identity).GetComponent<ParticleText>();
 		text.SetText(TargettingLineResults[resultText]);
 		targetLocationCursor.Stop();
+		finishTargetSound.Play();
 	}
 
 	/// <summary>
@@ -253,6 +256,7 @@ public class Cannon : MonoBehaviour
 		text.SetText(TargettingLineResults[3]);
 		targetLocationCursor.Stop();
 		coolDownTimer = 0f;
+		finishTargetSound.Play();
 	}
 
 	/// <summary>

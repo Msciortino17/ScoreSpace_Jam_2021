@@ -338,16 +338,36 @@ PrefabInstance:
       value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 7565059090361866383, guid: 7535712e17b22f34ba4b6ea42a8995d2, type: 3}
+      propertyPath: attackTime
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7565059090361866383, guid: 7535712e17b22f34ba4b6ea42a8995d2, type: 3}
+      propertyPath: orbitRange
+      value: 3.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7565059090361866383, guid: 7535712e17b22f34ba4b6ea42a8995d2, type: 3}
       propertyPath: behaviorTime
-      value: 0.5
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7565059090361866383, guid: 7535712e17b22f34ba4b6ea42a8995d2, type: 3}
+      propertyPath: maxMoveSpeed
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 7565059090361866383, guid: 7535712e17b22f34ba4b6ea42a8995d2, type: 3}
+      propertyPath: minMoveSpeed
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 7565059090361866383, guid: 7535712e17b22f34ba4b6ea42a8995d2, type: 3}
       propertyPath: farOrbitRange
-      value: 6
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 7565059090361866383, guid: 7535712e17b22f34ba4b6ea42a8995d2, type: 3}
       propertyPath: spriteRotateSpeed
       value: 180
+      objectReference: {fileID: 0}
+    - target: {fileID: 7565059090361866383, guid: 7535712e17b22f34ba4b6ea42a8995d2, type: 3}
+      propertyPath: damagedSpriteRotateSpeed
+      value: 720
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7535712e17b22f34ba4b6ea42a8995d2, type: 3}

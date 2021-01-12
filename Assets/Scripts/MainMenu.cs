@@ -26,6 +26,7 @@ public class MainMenu : MonoBehaviour
 	[SerializeField] private GameObject optionsMenu;
 	[SerializeField] private GameObject creditsMenu;
 	[SerializeField] private Text highScoreText;
+	[SerializeField] private Toggle enemyHealthToggle;
 
 	[Header("Tutorial Stuff")]
 	public List<GameObject> TutorialSteps = new List<GameObject>();
@@ -47,6 +48,8 @@ public class MainMenu : MonoBehaviour
 			highScoreInfo += score.name + " - " + score.score + "\n";
 		}
 		highScoreText.text = highScoreInfo;
+		bool showEnemyHealth = PlayerPrefs.GetInt("ShowEnemyHealth", 0) == 1;
+		enemyHealthToggle.isOn = showEnemyHealth;
 	}
 
 	// Update is called once per frame
@@ -141,23 +144,28 @@ public class MainMenu : MonoBehaviour
 		MusicSlider.value = musicVolume;
 	}
 
-	public void SetEffectVolume(float volume)
+	public void SetEffectVolume(float _volume)
 	{
-		if (volume < -39f)
+		if (_volume < -39f)
 		{
-			volume = -80f;
+			_volume = -80f;
 		}
-		MasterMixer.SetFloat("EffectsVolume", volume);
-		PlayerPrefs.SetFloat(effectVolumeKey, volume);
+		MasterMixer.SetFloat("EffectsVolume", _volume);
+		PlayerPrefs.SetFloat(effectVolumeKey, _volume);
 	}
 
-	public void SetMusicVolume(float volume)
+	public void SetMusicVolume(float _volume)
 	{
-		if (volume < -39f)
+		if (_volume < -39f)
 		{
-			volume = -80f;
+			_volume = -80f;
 		}
-		MasterMixer.SetFloat("MusicVolume", volume);
-		PlayerPrefs.SetFloat(musicVolumeKey, volume);
+		MasterMixer.SetFloat("MusicVolume", _volume);
+		PlayerPrefs.SetFloat(musicVolumeKey, _volume);
+	}
+
+	public void SetShowEnemyHealth(bool _value)
+	{
+		PlayerPrefs.SetInt("ShowEnemyHealth", _value ? 1 : 0);
 	}
 }
